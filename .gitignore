@@ -1,0 +1,4 @@
+#Ignorando executaveis
+*.exe
+#Ignorando arquivos de projetos
+*.identcache
