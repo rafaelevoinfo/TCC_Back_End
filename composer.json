@@ -1,0 +1,19 @@
+{
+    "name": "rafael/tcc",
+    "description": "Sistema eletronico do TCC do curso de Especializa\u0000\u0000o em Engenharia de Software da PUC-Minas",
+    "type": "project",
+    "require": {
+        "slim/slim": "^3.9"
+    },
+    "authors": [
+        {
+            "name": "Rafael Freitas Costa",
+            "email": "rafaelevoinfo@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "": "src/"
+        }
+    }
+}

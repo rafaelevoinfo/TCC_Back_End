@@ -1,2 +1,3 @@
 #Ignorando arquivos de projetos
 *.identcache
+/vendor/
