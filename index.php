@@ -33,13 +33,13 @@ $container['db'] = function ($c) {
     $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
     return $pdo;
 };
-
+//*********************** AUTENTICACAO ********************************** */
 $app->get('/index/auth', function (Request $request, Response $response, array $args) {
     $vaController = new AutenticacaoController($this);
     return $vaController->fpuAutenticar();
 });
 
-//**************************Clientes********************************* */
+//************************** Clientes ********************************* */
 $app->get('/index/clientes', function (Request $request, Response $response, array $args) {
     $vaController = new ClienteController($this);
     return $vaController->fpuBuscar('');

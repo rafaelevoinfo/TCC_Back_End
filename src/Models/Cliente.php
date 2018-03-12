@@ -23,6 +23,7 @@ class Cliente extends Modelo
                         cliente.senha
                  FROM cliente';
     const SQL_LIMIT = ' limit 50';
+    const SQL_ORDER_BY = ' order by nome ';
 
     private function ppvCopiarDados($cliente)
     {
@@ -46,15 +47,22 @@ class Cliente extends Modelo
     }
 
     public function fpuCarregarPorCpf($cpf)
-    {
-        $vaSql = self::SQL . ' where cliente.cpf = "' . $cpf . '"' . self::SQL_LIMIT;
+    {    
+        $vaSql = self::SQL . ' where cliente.cpf = "' . $cpf . '"' .self::SQL_ORDER_BY. self::SQL_LIMIT;
         $this->ppvBuscarCarregar($vaSql);
         return ($this->cpf != '');
     }
 
     public function fpuCarregarPorNome($nome)
     {
-        $vaSql = self::SQL . ' where cliente.nome LIKE "' . $nome . '%"' . self::SQL_LIMIT;
+        $vaSql = self::SQL . ' where Upper(cliente.nome) LIKE "' . strtoupper($nome) . '%"' .self::SQL_ORDER_BY. self::SQL_LIMIT;
+        $this->ppvBuscarCarregar($vaSql);
+        return ($this->cpf != '');
+    }
+
+    public function fpuCarregarPorEmail($email)
+    {
+        $vaSql = self::SQL . ' where UPPER(cliente.email) = "' . strtoupper($email) . '"' .self::SQL_ORDER_BY. self::SQL_LIMIT;
         $this->ppvBuscarCarregar($vaSql);
         return ($this->cpf != '');
     }
@@ -62,17 +70,18 @@ class Cliente extends Modelo
     public function fpuBuscarTodos()
     {
         $vaClientes = [];
-        $vaStatement = $this->app->db->query(self::SQL . self::SQL_LIMIT);
-        if ($vaCliente = $vaStatement->fetchObject('\Models\Cliente',array($this->app))) {
+        $vaStatement = $this->app->db->query(self::SQL .self::SQL_ORDER_BY. self::SQL_LIMIT);
+        while ($vaCliente = $vaStatement->fetchObject('\Models\Cliente', array($this->app))) {
             $vaClientes[] = $vaCliente;
         }
         return $vaClientes;
     }
 
-    public function fpuExcluir(){
-        if ($this->app->db->exec('DELETE from cliente where cliente.cpf = "'.$this->cpf.'"')===1){
+    public function fpuExcluir()
+    {
+        if ($this->app->db->exec('DELETE from cliente where cliente.cpf = "' . $this->cpf . '"') === 1) {
             return self::STATUS_OK;
-        }else{
+        } else {
             return 'Não foi possível excluir esse cliente.';
         }
     }
@@ -82,27 +91,30 @@ class Cliente extends Modelo
         $vaCliente = new \Models\Cliente($this->app);
         if ($vaCliente->fpuCarregarPorCpf($this->cpf)) {
             $vaSql = 'UPDATE `cliente` SET `CPF`=:cpf,`NOME`=:nome,`ENDERECO`=:endereco,`ESTADO`=:estado,
-            `MUNICIPIO`=:municipio,`TELEFONE`=:telefone,`EMAIL`=:email,`SENHA`=:senha WHERE cliente.cpf = :cpf';            
+            `MUNICIPIO`=:municipio,`TELEFONE`=:telefone,`EMAIL`=:email,`SENHA`=:senha WHERE cliente.cpf = :cpf';
         } else {
             $vaSql = 'INSERT INTO `cliente`(`CPF`, `NOME`, `ENDERECO`, `ESTADO`, `MUNICIPIO`, `TELEFONE`, `EMAIL`, `SENHA`)
-            VALUES (:cpf,:nome,:endereco, :estado,:municipio,:telefone,:email,:senha)';            
+            VALUES (:cpf,:nome,:endereco, :estado,:municipio,:telefone,:email,:senha)';
+        }
+        
+        if ((!$vaCliente->fpuCarregarPorEmail($this->email))||($vaCliente->cpf===$this->cpf)) {
+            $vaStatement = $this->app->db->prepare($vaSql);
+            $vaStatement->bindValue(':cpf', $this->cpf);
+            $vaStatement->bindValue(':nome', $this->nome);
+            $vaStatement->bindValue(':endereco', $this->endereco);
+            $vaStatement->bindValue(':estado', $this->estado);
+            $vaStatement->bindValue(':municipio', $this->municipio);
+            $vaStatement->bindValue(':telefone', $this->telefone);
+            $vaStatement->bindValue(':email', $this->email);
+            $vaStatement->bindValue(':senha', $this->senha);
+            if ($vaStatement->execute()) {
+                return Modelo::STATUS_OK;
+            } else {
+                return 'Não foi possível salvar o cliente';
+            }
+        } else {
+            return 'E-mail já cadastrado';
         }
 
-        //TODO: Validar o email aqui
-
-        $vaStatement = $this->app->db->prepare($vaSql);
-        $vaStatement->bindValue(':cpf', $this->cpf);
-        $vaStatement->bindValue(':nome', $this->nome);
-        $vaStatement->bindValue(':endereco', $this->endereco);
-        $vaStatement->bindValue(':estado', $this->estado);
-        $vaStatement->bindValue(':municipio', $this->municipio);
-        $vaStatement->bindValue(':telefone', $this->telefone);
-        $vaStatement->bindValue(':email', $this->email);
-        $vaStatement->bindValue(':senha', $this->senha);
-        if ($vaStatement->execute()){
-            return self::STATUS_OK;
-        }else{
-            return 'Não foi possível salvar o cliente';
-        }
     }
 }

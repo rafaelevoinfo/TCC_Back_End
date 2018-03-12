@@ -1,20 +1,13 @@
 <?php
 namespace Controllers;
 
-class ClienteController
+class ClienteController extends BaseController
 {
     private $app;
 
     public function __construct($app)
     {
         $this->app = $app;
-    }
-
-    private function fpvRetornarStatus($status)
-    {
-        return \json_encode(array(
-            'status' => $status,
-        ));
     }
 
     public function fpuIncluirAlterar($request)
@@ -26,9 +19,9 @@ class ClienteController
                 $vaCliente->$key = $value;
             }
             $vaStatus = $vaCliente->fpuSalvar();
-            return $this->fpvRetornarStatus($vaStatus);
+            return $this->fprRetornarStatus($vaStatus);
         }else{
-            return $this->fpvRetornarStatus('Os dados do cliente não foram informados.');
+            return $this->fprRetornarStatus('Os dados do cliente não foram informados.');
         }
 
        
@@ -39,15 +32,19 @@ class ClienteController
         $vaCliente = new \Models\Cliente($this->app);
         if ($vaCliente->fpuCarregarPorCpf($cpf)) {
             $vaStatus = $vaCliente->fpuExcluir();
-            return $this->fpvRetornarStatus($vaStatus);
+            return $this->fprRetornarStatus($vaStatus);
         } else {
-            return $this->fpvRetornarStatus('Cliente não encontrado');
+            return $this->fprRetornarStatus('Cliente não encontrado');
         }
     }
 
     public function fpuBuscar($filtro)
     {
         $vaCliente = new \Models\Cliente($this->app);
+        //Removendo . e - do CPF (se for um CPF)
+        $filtro = str_replace('.','',$filtro);
+        $filtro = str_replace('-','',$filtro);
+
         if ((\is_numeric($filtro)) || ($filtro != '')) {
             $vaAchou = false;
             if (\is_numeric($filtro)) {
@@ -57,7 +54,7 @@ class ClienteController
             }
 
             if ($vaAchou) {
-                return \json_encode($vaCliente);
+                return \json_encode(array($vaCliente));
             } else {
                 return '';
             }
