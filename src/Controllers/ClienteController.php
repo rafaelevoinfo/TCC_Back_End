@@ -18,6 +18,8 @@ class ClienteController extends BaseController
             foreach ($vaPostData as $key => $value) {
                 $vaCliente->$key = $value;
             }
+            $vaCliente->cpf = str_replace('.','',$vaCliente->cpf);
+            $vaCliente->cpf = str_replace('-','',$vaCliente->cpf);
             $vaStatus = $vaCliente->fpuSalvar();
             return $this->fprRetornarStatus($vaStatus);
         }else{
@@ -49,15 +51,14 @@ class ClienteController extends BaseController
             $vaAchou = false;
             if (\is_numeric($filtro)) {
                 $vaAchou = $vaCliente->fpuCarregarPorCpf($filtro);
+                if ($vaAchou){
+                    $vaClientes[] = $vaCliente;
+                }
             } else if ($filtro != '') {
-                $vaAchou = $vaCliente->fpuCarregarPorNome($filtro);
+                $vaClientes = $vaCliente->fpuCarregarPorNome($filtro);                                
             }
-
-            if ($vaAchou) {
-                return \json_encode(array($vaCliente));
-            } else {
-                return '';
-            }
+            
+            return \json_encode($vaClientes);            
         } else {
             $vaClientes = $vaCliente->fpuBuscarTodos();
             return \json_encode($vaClientes);

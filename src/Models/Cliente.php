@@ -1,10 +1,13 @@
 <?php
 namespace Models;
 
-class Cliente extends Modelo
-{
+class ClienteSimple extends Modelo{
     public $cpf;
     public $nome;
+}
+
+class Cliente extends ClienteSimple
+{    
     public $endereco;
     public $estado;
     public $municipio;
@@ -37,11 +40,11 @@ class Cliente extends Modelo
         $this->senha = $cliente->senha;
     }
 
-    private function ppvBuscarCarregar($sql)
+    private function ppvBuscarCarregar($sql,$classe)
     {
         $vaStatement = $this->app->db->query($sql);
         $this->cpf = '';
-        if ($vaCliente = $vaStatement->fetchObject('\Models\Cliente', array($this->app))) {
+        if ($vaCliente = $vaStatement->fetchObject($classe, array($this->app))) {
             $this->ppvCopiarDados($vaCliente);
         }
     }
@@ -49,29 +52,41 @@ class Cliente extends Modelo
     public function fpuCarregarPorCpf($cpf)
     {    
         $vaSql = self::SQL . ' where cliente.cpf = "' . $cpf . '"' .self::SQL_ORDER_BY. self::SQL_LIMIT;
-        $this->ppvBuscarCarregar($vaSql);
+        $this->ppvBuscarCarregar($vaSql,'\Models\Cliente');
         return ($this->cpf != '');
     }
 
     public function fpuCarregarPorNome($nome)
     {
-        $vaSql = self::SQL . ' where Upper(cliente.nome) LIKE "' . strtoupper($nome) . '%"' .self::SQL_ORDER_BY. self::SQL_LIMIT;
-        $this->ppvBuscarCarregar($vaSql);
-        return ($this->cpf != '');
+        $vaClientes = [];
+        $vaSql = 'SELECT cliente.cpf,
+                         cliente.nome
+                  FROM cliente 
+                  where Upper(cliente.nome) LIKE "' . strtoupper($nome) . '%"' .
+                  self::SQL_ORDER_BY. self::SQL_LIMIT;
+         
+        $vaStatement = $this->app->db->query($vaSql);
+        while ($vaCliente = $vaStatement->fetchObject('\Models\ClienteSimple', array($this->app))) {
+            $vaClientes[] = $vaCliente;
+        }
+        return $vaClientes;
     }
 
     public function fpuCarregarPorEmail($email)
     {
         $vaSql = self::SQL . ' where UPPER(cliente.email) = "' . strtoupper($email) . '"' .self::SQL_ORDER_BY. self::SQL_LIMIT;
-        $this->ppvBuscarCarregar($vaSql);
+        $this->ppvBuscarCarregar($vaSql,'\Models\Cliente');
         return ($this->cpf != '');
     }
 
     public function fpuBuscarTodos()
     {
         $vaClientes = [];
-        $vaStatement = $this->app->db->query(self::SQL .self::SQL_ORDER_BY. self::SQL_LIMIT);
-        while ($vaCliente = $vaStatement->fetchObject('\Models\Cliente', array($this->app))) {
+        $vaStatement = $this->app->db->query('SELECT cliente.cpf,
+                                                    cliente.nome
+                                              FROM cliente '.
+                                              self::SQL_ORDER_BY. self::SQL_LIMIT);
+        while ($vaCliente = $vaStatement->fetchObject('\Models\ClienteSimple', array($this->app))) {
             $vaClientes[] = $vaCliente;
         }
         return $vaClientes;
