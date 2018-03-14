@@ -1,13 +1,14 @@
 <?php
 namespace Models;
 
-class ClienteSimple extends Modelo{
+class ClienteSimple extends Modelo
+{
     public $cpf;
     public $nome;
 }
 
 class Cliente extends ClienteSimple
-{    
+{
     public $endereco;
     public $estado;
     public $municipio;
@@ -40,7 +41,7 @@ class Cliente extends ClienteSimple
         $this->senha = $cliente->senha;
     }
 
-    private function ppvBuscarCarregar($sql,$classe)
+    private function ppvBuscarCarregar($sql, $classe)
     {
         $vaStatement = $this->app->db->query($sql);
         $this->cpf = '';
@@ -50,9 +51,9 @@ class Cliente extends ClienteSimple
     }
 
     public function fpuCarregarPorCpf($cpf)
-    {    
-        $vaSql = self::SQL . ' where cliente.cpf = "' . $cpf . '"' .self::SQL_ORDER_BY. self::SQL_LIMIT;
-        $this->ppvBuscarCarregar($vaSql,'\Models\Cliente');
+    {
+        $vaSql = self::SQL . ' where cliente.cpf = "' . $cpf . '"' . self::SQL_ORDER_BY . self::SQL_LIMIT;
+        $this->ppvBuscarCarregar($vaSql, '\Models\Cliente');
         return ($this->cpf != '');
     }
 
@@ -61,10 +62,10 @@ class Cliente extends ClienteSimple
         $vaClientes = [];
         $vaSql = 'SELECT cliente.cpf,
                          cliente.nome
-                  FROM cliente 
+                  FROM cliente
                   where Upper(cliente.nome) LIKE "' . strtoupper($nome) . '%"' .
-                  self::SQL_ORDER_BY. self::SQL_LIMIT;
-         
+        self::SQL_ORDER_BY . self::SQL_LIMIT;
+
         $vaStatement = $this->app->db->query($vaSql);
         while ($vaCliente = $vaStatement->fetchObject('\Models\ClienteSimple', array($this->app))) {
             $vaClientes[] = $vaCliente;
@@ -74,8 +75,8 @@ class Cliente extends ClienteSimple
 
     public function fpuCarregarPorEmail($email)
     {
-        $vaSql = self::SQL . ' where UPPER(cliente.email) = "' . strtoupper($email) . '"' .self::SQL_ORDER_BY. self::SQL_LIMIT;
-        $this->ppvBuscarCarregar($vaSql,'\Models\Cliente');
+        $vaSql = self::SQL . ' where UPPER(cliente.email) = "' . strtoupper($email) . '"' . self::SQL_ORDER_BY . self::SQL_LIMIT;
+        $this->ppvBuscarCarregar($vaSql, '\Models\Cliente');
         return ($this->cpf != '');
     }
 
@@ -84,8 +85,8 @@ class Cliente extends ClienteSimple
         $vaClientes = [];
         $vaStatement = $this->app->db->query('SELECT cliente.cpf,
                                                     cliente.nome
-                                              FROM cliente '.
-                                              self::SQL_ORDER_BY. self::SQL_LIMIT);
+                                              FROM cliente ' .
+            self::SQL_ORDER_BY . self::SQL_LIMIT);
         while ($vaCliente = $vaStatement->fetchObject('\Models\ClienteSimple', array($this->app))) {
             $vaClientes[] = $vaCliente;
         }
@@ -94,10 +95,14 @@ class Cliente extends ClienteSimple
 
     public function fpuExcluir()
     {
-        if ($this->app->db->exec('DELETE from cliente where cliente.cpf = "' . $this->cpf . '"') === 1) {
-            return self::STATUS_OK;
+        if ($this->nome != 'admin') {
+            if ($this->app->db->exec('DELETE from cliente where cliente.cpf = "' . $this->cpf . '"') === 1) {
+                return self::STATUS_OK;
+            } else {
+                return 'Não foi possível excluir esse cliente.';
+            }
         } else {
-            return 'Não foi possível excluir esse cliente.';
+            return 'Não é permitido excluir o admin';
         }
     }
 
@@ -111,8 +116,8 @@ class Cliente extends ClienteSimple
             $vaSql = 'INSERT INTO `cliente`(`CPF`, `NOME`, `ENDERECO`, `ESTADO`, `MUNICIPIO`, `TELEFONE`, `EMAIL`, `SENHA`)
             VALUES (:cpf,:nome,:endereco, :estado,:municipio,:telefone,:email,:senha)';
         }
-        
-        if ((!$vaCliente->fpuCarregarPorEmail($this->email))||($vaCliente->cpf===$this->cpf)) {
+
+        if ((!$vaCliente->fpuCarregarPorEmail($this->email)) || ($vaCliente->cpf === $this->cpf)) {
             $vaStatement = $this->app->db->prepare($vaSql);
             $vaStatement->bindValue(':cpf', $this->cpf);
             $vaStatement->bindValue(':nome', $this->nome);

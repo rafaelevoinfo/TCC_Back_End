@@ -9,20 +9,20 @@ require 'vendor/autoload.php';
 
 $config['displayErrorDetails'] = true;
 $config['addContentLengthHeader'] = false;
-
+//****************** CONFIGURACOES DE DEBUG *************/
 $config['db']['host']   = 'localhost';
 $config['db']['user']   = 'root';
 $config['db']['pass']   = '';
 $config['db']['dbname'] = 'tcc';
 
+//****************** CONFIGURACOES DE RELEASE *************/
+// $config['db']['host']   = 'localhost';
+// $config['db']['user']   = 'id5062092_root';
+// $config['db']['pass']   = 'root04';
+// $config['db']['dbname'] = 'id5062092_tcc';
+
+
 $app = new \Slim\App(['settings' => $config]);
-
-/*$app->get('/index/{name}', function (Request $request, Response $response, array $args) {
-    $name = $args['name'];
-    $response->getBody()->write("Hello, $name");
-
-    return $response;
-});*/
 
 $container = $app->getContainer();
 $container['db'] = function ($c) {
