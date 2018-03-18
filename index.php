@@ -2,7 +2,7 @@
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
 use \Controllers\AutenticacaoController;
-use \Controllers\ClienteController;
+use \Controllers\UsuarioController;
 
 
 require 'vendor/autoload.php';
@@ -36,28 +36,28 @@ $container['db'] = function ($c) {
 //*********************** AUTENTICACAO ********************************** */
 $app->get('/index/auth', function (Request $request, Response $response, array $args) {
     $vaController = new AutenticacaoController($this);
-    return $vaController->fpuAutenticar();
+    return $vaController->autenticar();
 });
 
-//************************** Clientes ********************************* */
-$app->get('/index/clientes', function (Request $request, Response $response, array $args) {
-    $vaController = new ClienteController($this);
-    return $vaController->fpuBuscar('');
+//************************** Usuarios ********************************* */
+$app->get('/index/usuarios', function (Request $request, Response $response, array $args) {
+    $vaController = new UsuarioController($this);
+    return $vaController->buscar('');
 });
 
-$app->get('/index/clientes/{cpf_ou_nome}', function (Request $request, Response $response, array $args) {
-    $vaController = new ClienteController($this);
-    return $vaController->fpuBuscar($args['cpf_ou_nome']);
+$app->get('/index/usuarios/{cpf_ou_nome}', function (Request $request, Response $response, array $args) {
+    $vaController = new UsuarioController($this);
+    return $vaController->buscar($args['cpf_ou_nome']);
 });
 
-$app->map(['PUT','POST'], '/index/clientes', function (Request $request, Response $response, array $args){
-    $vaController = new ClienteController($this);
-    return $vaController->fpuIncluirAlterar($request);
+$app->map(['PUT','POST'], '/index/usuarios', function (Request $request, Response $response, array $args){
+    $vaController = new UsuarioController($this);
+    return $vaController->salvar($request);
 });
 
-$app->delete('/index/clientes/{cpf}', function (Request $request, Response $response, array $args) {
-    $vaController = new ClienteController($this);
-    return $vaController->fpuExcluir($args['cpf']);
+$app->delete('/index/usuarios/{cpf}', function (Request $request, Response $response, array $args) {
+    $vaController = new UsuarioController($this);
+    return $vaController->excluir($args['cpf']);
 });
 
 $app->run();

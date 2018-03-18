@@ -2,7 +2,7 @@
 namespace Controllers;
 
 class BaseController{
-    protected function fprRetornarStatus($status)
+    protected function retornarStatus($status)
     {
         return \json_encode(array(
             'status' => $status,

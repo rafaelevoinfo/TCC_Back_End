@@ -9,17 +9,17 @@ class AutenticacaoController extends BaseController
     {
         $this->app = $app;
     }
-    public function fpuAutenticar()
+    public function autenticar()
     {
         if ((isset($_SERVER["PHP_AUTH_USER"])) && (isset($_SERVER["PHP_AUTH_PW"]))) {            
-            $vaCliente = new \Models\Cliente($this->app);
-            if (($vaCliente->fpuCarregarPorEmail($_SERVER["PHP_AUTH_USER"])) && ($vaCliente->senha === $_SERVER["PHP_AUTH_PW"])){
-                return $this->fprRetornarStatus(\Models\Modelo::STATUS_OK); 
+            $vaUsuario = new \Models\Usuario($this->app);
+            if (($vaUsuario->carregarPorEmail($_SERVER["PHP_AUTH_USER"])) && ($vaUsuario->validarSenha($_SERVER["PHP_AUTH_PW"]))){
+                return $this->retornarStatus(\Models\Modelo::STATUS_OK); 
             }else{
-                return $this->fprRetornarStatus('Usuário e/ou senha incorretos');
+                return $this->retornarStatus('Usuário e/ou senha incorretos');
             }              
         } else {
-            return $this->fprRetornarStatus('Usuário e/ou senha não informados');
+            return $this->retornarStatus('Usuário e/ou senha não informados');
         }
     }
 }

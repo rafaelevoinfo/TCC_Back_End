@@ -1,13 +1,13 @@
 <?php
 namespace Models;
 
-class ClienteSimple extends Modelo
+class UsuarioSimples extends Modelo
 {
     public $cpf;
     public $nome;
 }
 
-class Cliente extends ClienteSimple
+class Usuario extends UsuarioSimples
 {
     public $endereco;
     public $estado;
@@ -29,37 +29,41 @@ class Cliente extends ClienteSimple
     const SQL_LIMIT = ' limit 50';
     const SQL_ORDER_BY = ' order by nome ';
 
-    private function ppvCopiarDados($cliente)
+    private function copiarDados($usuario)
     {
-        $this->cpf = $cliente->cpf;
-        $this->nome = $cliente->nome;
-        $this->endereco = $cliente->endereco;
-        $this->estado = $cliente->estado;
-        $this->municipio = $cliente->municipio;
-        $this->telefone = $cliente->telefone;
-        $this->email = $cliente->email;
-        $this->senha = $cliente->senha;
+        $this->cpf = $usuario->cpf;
+        $this->nome = $usuario->nome;
+        $this->endereco = $usuario->endereco;
+        $this->estado = $usuario->estado;
+        $this->municipio = $usuario->municipio;
+        $this->telefone = $usuario->telefone;
+        $this->email = $usuario->email;
+        $this->senha = $usuario->senha;
     }
 
-    private function ppvBuscarCarregar($sql, $classe)
+    private function buscarCarregar($sql, $classe)
     {
         $vaStatement = $this->app->db->query($sql);
         $this->cpf = '';
-        if ($vaCliente = $vaStatement->fetchObject($classe, array($this->app))) {
-            $this->ppvCopiarDados($vaCliente);
+        if ($vaUsuario = $vaStatement->fetchObject($classe, array($this->app))) {
+            $this->copiarDados($vaUsuario);
         }
     }
 
-    public function fpuCarregarPorCpf($cpf)
+    public function validarSenha($senha){
+        return $senha===$this->senha;
+    }
+
+    public function carregarPorCpf($cpf)
     {
         $vaSql = self::SQL . ' where cliente.cpf = "' . $cpf . '"' . self::SQL_ORDER_BY . self::SQL_LIMIT;
-        $this->ppvBuscarCarregar($vaSql, '\Models\Cliente');
+        $this->buscarCarregar($vaSql, '\Models\Usuario');
         return ($this->cpf != '');
     }
 
-    public function fpuCarregarPorNome($nome)
+    public function carregarPorNome($nome)
     {
-        $vaClientes = [];
+        $vaUsuarios = [];
         $vaSql = 'SELECT cliente.cpf,
                          cliente.nome
                   FROM cliente
@@ -67,33 +71,33 @@ class Cliente extends ClienteSimple
         self::SQL_ORDER_BY . self::SQL_LIMIT;
 
         $vaStatement = $this->app->db->query($vaSql);
-        while ($vaCliente = $vaStatement->fetchObject('\Models\ClienteSimple', array($this->app))) {
-            $vaClientes[] = $vaCliente;
+        while ($vaUsuario = $vaStatement->fetchObject('\Models\UsuarioSimples', array($this->app))) {
+            $vaUsuarios[] = $vaUsuario;
         }
-        return $vaClientes;
+        return $vaUsuarios;
     }
 
-    public function fpuCarregarPorEmail($email)
+    public function carregarPorEmail($email)
     {
         $vaSql = self::SQL . ' where UPPER(cliente.email) = "' . strtoupper($email) . '"' . self::SQL_ORDER_BY . self::SQL_LIMIT;
-        $this->ppvBuscarCarregar($vaSql, '\Models\Cliente');
+        $this->buscarCarregar($vaSql, '\Models\Usuario');
         return ($this->cpf != '');
     }
 
-    public function fpuBuscarTodos()
+    public function buscarTodos()
     {
-        $vaClientes = [];
+        $vaUsuarios = [];
         $vaStatement = $this->app->db->query('SELECT cliente.cpf,
                                                     cliente.nome
                                               FROM cliente ' .
             self::SQL_ORDER_BY . self::SQL_LIMIT);
-        while ($vaCliente = $vaStatement->fetchObject('\Models\ClienteSimple', array($this->app))) {
-            $vaClientes[] = $vaCliente;
+        while ($vaUsuario = $vaStatement->fetchObject('\Models\UsuarioSimples', array($this->app))) {
+            $vaUsuarios[] = $vaUsuario;
         }
-        return $vaClientes;
+        return $vaUsuarios;
     }
 
-    public function fpuExcluir()
+    public function excluir()
     {
         if ($this->nome != 'admin') {
             if ($this->app->db->exec('DELETE from cliente where cliente.cpf = "' . $this->cpf . '"') === 1) {
@@ -106,10 +110,10 @@ class Cliente extends ClienteSimple
         }
     }
 
-    public function fpuSalvar()
+    public function salvar()
     {
-        $vaCliente = new \Models\Cliente($this->app);
-        if ($vaCliente->fpuCarregarPorCpf($this->cpf)) {
+        $vaUsuario = new \Models\Usuario($this->app);
+        if ($vaUsuario->carregarPorCpf($this->cpf)) {
             $vaSql = 'UPDATE `cliente` SET `CPF`=:cpf,`NOME`=:nome,`ENDERECO`=:endereco,`ESTADO`=:estado,
             `MUNICIPIO`=:municipio,`TELEFONE`=:telefone,`EMAIL`=:email,`SENHA`=:senha WHERE cliente.cpf = :cpf';
         } else {
@@ -117,7 +121,7 @@ class Cliente extends ClienteSimple
             VALUES (:cpf,:nome,:endereco, :estado,:municipio,:telefone,:email,:senha)';
         }
 
-        if ((!$vaCliente->fpuCarregarPorEmail($this->email)) || ($vaCliente->cpf === $this->cpf)) {
+        if ((!$vaUsuario->carregarPorEmail($this->email)) || ($vaUsuario->cpf === $this->cpf)) {
             $vaStatement = $this->app->db->prepare($vaSql);
             $vaStatement->bindValue(':cpf', $this->cpf);
             $vaStatement->bindValue(':nome', $this->nome);
