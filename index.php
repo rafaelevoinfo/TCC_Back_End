@@ -1,8 +1,8 @@
 <?php
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
-use \Controllers\AutenticacaoController;
-use \Controllers\UsuarioController;
+use \Controllers\ControleAutenticacao;
+use \Controllers\ControleUsuario;
 
 
 require 'vendor/autoload.php';
@@ -35,28 +35,28 @@ $container['db'] = function ($c) {
 };
 //*********************** AUTENTICACAO ********************************** */
 $app->get('/index/auth', function (Request $request, Response $response, array $args) {
-    $vaController = new AutenticacaoController($this);
-    return $vaController->autenticar();
+    $vaController = new ControleAutenticacao($this);
+    return $vaController->autenticar($_SERVER["PHP_AUTH_USER"],$_SERVER["PHP_AUTH_PW"]);
 });
 
 //************************** Usuarios ********************************* */
 $app->get('/index/usuarios', function (Request $request, Response $response, array $args) {
-    $vaController = new UsuarioController($this);
+    $vaController = new ControleUsuario($this);
     return $vaController->buscar('');
 });
 
 $app->get('/index/usuarios/{cpf_ou_nome}', function (Request $request, Response $response, array $args) {
-    $vaController = new UsuarioController($this);
+    $vaController = new ControleUsuario($this);
     return $vaController->buscar($args['cpf_ou_nome']);
 });
 
 $app->map(['PUT','POST'], '/index/usuarios', function (Request $request, Response $response, array $args){
-    $vaController = new UsuarioController($this);
+    $vaController = new ControleUsuario($this);
     return $vaController->salvar($request);
 });
 
 $app->delete('/index/usuarios/{cpf}', function (Request $request, Response $response, array $args) {
-    $vaController = new UsuarioController($this);
+    $vaController = new ControleUsuario($this);
     return $vaController->excluir($args['cpf']);
 });
 

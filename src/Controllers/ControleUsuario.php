@@ -1,15 +1,8 @@
 <?php
 namespace Controllers;
 
-class UsuarioController extends BaseController
+class ControleUsuario extends ControleBasicoCrud
 {
-    private $app;
-
-    public function __construct($app)
-    {
-        $this->app = $app;
-    }
-
     private function criarUsuario($postData){
         $vaUsuario = new \Models\Usuario($this->app);
         foreach ($postData as $key => $value) {
@@ -24,7 +17,7 @@ class UsuarioController extends BaseController
     {        
         $vaPostData = $request->getParsedBody();
         if (isset($vaPostData)) {
-            $vaUsuario = criarUsuario($vaPostData);
+            $vaUsuario = $this->criarUsuario($vaPostData);
             $vaStatus = $vaUsuario->salvar();
             return $this->retornarStatus($vaStatus);
         }else{
@@ -60,7 +53,7 @@ class UsuarioController extends BaseController
                     $vaUsuarios[] = $vaUsuario;
                 }
             } else if ($filtro != '') {
-                $vaUsuarios = $vaUsuario->carregarPorNome($filtro);                                
+                $vaUsuarios = $vaUsuario->buscarPorNome($filtro);                                
             }
             
             return \json_encode($vaUsuarios);            

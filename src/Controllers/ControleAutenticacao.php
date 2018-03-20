@@ -1,19 +1,13 @@
 <?php
 namespace Controllers;
 
-class AutenticacaoController extends BaseController
+class ControleAutenticacao extends ControleBasico
 {
-    private $app;
-
-    public function __construct($app)
+    public function autenticar($usuario, $senha)
     {
-        $this->app = $app;
-    }
-    public function autenticar()
-    {
-        if ((isset($_SERVER["PHP_AUTH_USER"])) && (isset($_SERVER["PHP_AUTH_PW"]))) {            
+        if ((isset($usuario)) && (isset($senha))) {            
             $vaUsuario = new \Models\Usuario($this->app);
-            if (($vaUsuario->carregarPorEmail($_SERVER["PHP_AUTH_USER"])) && ($vaUsuario->validarSenha($_SERVER["PHP_AUTH_PW"]))){
+            if (($vaUsuario->carregarPorEmail($usuario)) && ($vaUsuario->validarSenha($senha))){
                 return $this->retornarStatus(\Models\Modelo::STATUS_OK); 
             }else{
                 return $this->retornarStatus('Usuário e/ou senha incorretos');

@@ -4,7 +4,7 @@ namespace Models;
 class UsuarioSimples extends Modelo
 {
     public $cpf;
-    public $nome;
+    public $nome;    
 }
 
 class Usuario extends UsuarioSimples
@@ -61,7 +61,7 @@ class Usuario extends UsuarioSimples
         return ($this->cpf != '');
     }
 
-    public function carregarPorNome($nome)
+    public function buscarPorNome($nome)
     {
         $vaUsuarios = [];
         $vaSql = 'SELECT cliente.cpf,
