@@ -4,7 +4,7 @@ namespace Models;
 class UsuarioSimples extends Modelo
 {
     public $cpf;
-    public $nome;    
+    public $nome;
 }
 
 class Usuario extends UsuarioSimples
@@ -50,8 +50,9 @@ class Usuario extends UsuarioSimples
         }
     }
 
-    public function validarSenha($senha){
-        return $senha===$this->senha;
+    public function validarSenha($senha)
+    {
+        return $senha === $this->senha;
     }
 
     public function carregarPorCpf($cpf)
@@ -110,35 +111,58 @@ class Usuario extends UsuarioSimples
         }
     }
 
+    private function gerarScriptInsert()
+    {
+        return 'INSERT INTO `cliente`(`CPF`, `NOME`, `ENDERECO`, `ESTADO`, `MUNICIPIO`, `TELEFONE`, `EMAIL`, `SENHA`)
+        VALUES (:cpf,:nome,:endereco, :estado,:municipio,:telefone,:email,:senha)';
+    }
+
+    private function gerarScriptUpdate()
+    {
+        return 'UPDATE `cliente` SET `CPF`=:cpf,`NOME`=:nome,`ENDERECO`=:endereco,`ESTADO`=:estado,
+        `MUNICIPIO`=:municipio,`TELEFONE`=:telefone,`EMAIL`=:email,`SENHA`=:senha WHERE cliente.cpf = :cpf';
+    }
+
+    private function validarEmailUnico($usuario)
+    {
+        //Nao pode achar o email, ou se achar tem que ser do usuario que esta sendo salvo
+        return (!$usuario->carregarPorEmail($this->email)) || ($usuario->cpf === $this->cpf);
+    }
+
+    private function gravarBanco($sql)
+    {
+        $vaStatement = $this->app->db->prepare($sql);
+        $vaStatement->bindValue(':cpf', $this->cpf);
+        $vaStatement->bindValue(':nome', $this->nome);
+        $vaStatement->bindValue(':endereco', $this->endereco);
+        $vaStatement->bindValue(':estado', $this->estado);
+        $vaStatement->bindValue(':municipio', $this->municipio);
+        $vaStatement->bindValue(':telefone', $this->telefone);
+        $vaStatement->bindValue(':email', $this->email);
+        $vaStatement->bindValue(':senha', $this->senha);
+        if ($vaStatement->execute()) {
+            return Modelo::STATUS_OK;
+        } else {
+            return 'Não foi possível salvar o cliente';
+        }
+    }
+
     public function salvar()
     {
         $vaUsuario = new \Models\Usuario($this->app);
         if ($vaUsuario->carregarPorCpf($this->cpf)) {
-            $vaSql = 'UPDATE `cliente` SET `CPF`=:cpf,`NOME`=:nome,`ENDERECO`=:endereco,`ESTADO`=:estado,
-            `MUNICIPIO`=:municipio,`TELEFONE`=:telefone,`EMAIL`=:email,`SENHA`=:senha WHERE cliente.cpf = :cpf';
+            $vaSql = $this->gerarScriptUpdate();
         } else {
-            $vaSql = 'INSERT INTO `cliente`(`CPF`, `NOME`, `ENDERECO`, `ESTADO`, `MUNICIPIO`, `TELEFONE`, `EMAIL`, `SENHA`)
-            VALUES (:cpf,:nome,:endereco, :estado,:municipio,:telefone,:email,:senha)';
+            $vaSql = $this->gerarScriptInsert();
         }
 
-        if ((!$vaUsuario->carregarPorEmail($this->email)) || ($vaUsuario->cpf === $this->cpf)) {
-            $vaStatement = $this->app->db->prepare($vaSql);
-            $vaStatement->bindValue(':cpf', $this->cpf);
-            $vaStatement->bindValue(':nome', $this->nome);
-            $vaStatement->bindValue(':endereco', $this->endereco);
-            $vaStatement->bindValue(':estado', $this->estado);
-            $vaStatement->bindValue(':municipio', $this->municipio);
-            $vaStatement->bindValue(':telefone', $this->telefone);
-            $vaStatement->bindValue(':email', $this->email);
-            $vaStatement->bindValue(':senha', $this->senha);
-            if ($vaStatement->execute()) {
-                return Modelo::STATUS_OK;
-            } else {
-                return 'Não foi possível salvar o cliente';
-            }
+        if ($this->validarEmailUnico($vaUsuario)) {
+            return $this->gravarBanco($vaSql);
         } else {
             return 'E-mail já cadastrado';
         }
 
     }
+
+    
 }
