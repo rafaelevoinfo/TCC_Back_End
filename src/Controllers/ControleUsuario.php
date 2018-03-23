@@ -3,7 +3,7 @@ namespace Controllers;
 
 class ControleUsuario extends ControleBasicoCrud
 {
-    private function criarUsuario($postData){
+    protected function criarObjeto($postData){
         $vaUsuario = new \Models\Usuario($this->app);
         foreach ($postData as $key => $value) {
             $vaUsuario->$key = $value;
