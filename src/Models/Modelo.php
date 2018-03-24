@@ -1,6 +1,7 @@
 <?php
 namespace Models;
 
+//** Classe base para todos os objetos de negocio */
 class Modelo
 {
     protected $app;

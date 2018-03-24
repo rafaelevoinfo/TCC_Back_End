@@ -1,6 +1,7 @@
 <?php 
 namespace Controllers;
 
+/** Classe basica para todo controler */
 abstract class ControleBasico{
     protected $app;
 

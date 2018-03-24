@@ -1,6 +1,7 @@
 <?php
 namespace Models;
 
+/** Classe criada para que durante as buscas nao retorne um json com todas as informações de um cliente */
 class UsuarioSimples extends Modelo
 {
     public $cpf;
@@ -29,6 +30,7 @@ class Usuario extends UsuarioSimples
     const SQL_LIMIT = ' limit 50';
     const SQL_ORDER_BY = ' order by nome ';
 
+    //Copia os dados do objeto passado para no parametro para o objeto atual
     private function copiarDados($usuario)
     {
         $this->cpf = $usuario->cpf;
@@ -41,6 +43,7 @@ class Usuario extends UsuarioSimples
         $this->senha = $usuario->senha;
     }
 
+    //Faz a busca no banco e alimenta os fields da classe
     private function buscarCarregar($sql, $classe)
     {
         $vaStatement = $this->app->db->query($sql);
@@ -150,6 +153,7 @@ class Usuario extends UsuarioSimples
     public function salvar()
     {
         $vaUsuario = new \Models\Usuario($this->app);
+        //se achar é pq esta alterando, senao esta inserindo
         if ($vaUsuario->carregarPorCpf($this->cpf)) {
             $vaSql = $this->gerarScriptUpdate();
         } else {
