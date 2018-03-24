@@ -32,7 +32,7 @@ class ControleUsuario extends ControleBasicoCrud
 
     public function excluir($cpf)
     {
-        $vaUsuario = new \Models\Usuario($this->app);
+        $vaUsuario = new \Models\Usuario($this->app);                
         if ($vaUsuario->carregarPorCpf($cpf)) {
             $vaStatus = $vaUsuario->excluir();
             return $this->retornarStatus($vaStatus);
@@ -40,17 +40,17 @@ class ControleUsuario extends ControleBasicoCrud
             return $this->retornarStatus('Usuario não encontrado');
         }
     }
-
+    
     public function buscar($filtro)
     {
         $vaUsuario = new \Models\Usuario($this->app);
         //Removendo . e - do CPF (se for um CPF)
-        $filtro = str_replace('.','',$filtro);
-        $filtro = str_replace('-','',$filtro);
+        $filtro = $vaUsuario->removerMascaraCpf($filtro);
 
+        $vaUsuarios = [];
         //se nao for passado filtro nenhum, vai retornar todos
         if ((\is_numeric($filtro)) || ($filtro != '')) {
-            $vaAchou = false;
+            $vaAchou = false;           
             //se é um numero entao é uma busca por CPF
             if (\is_numeric($filtro)) {
                 $vaAchou = $vaUsuario->carregarPorCpf($filtro);
@@ -69,3 +69,5 @@ class ControleUsuario extends ControleBasicoCrud
         }
     }
 }
+
+?>

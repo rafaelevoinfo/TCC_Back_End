@@ -1,0 +1,15 @@
+RewriteEngine On
+
+#rediciona tudo para o index.php
+#RewriteRule ^(.+)$ /index.php
+RewriteRule ^([0-9A-Za-z-_\/]+)$ /index.php
+
+# HTID:4663807: DO NOT REMOVE OR MODIFY THIS LINE AND THE LINES BELOW
+php_value display_errors 1
+# DO NOT REMOVE OR MODIFY THIS LINE AND THE LINES ABOVE HTID:4663807:
+
+php_value outputbuffering on
+
+Header set Access-Control-Allow-Origin "*"
+Header set Access-Control-Allow-Headers "Origin, X-Requested-With, Content-Type, Accept"
+Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE"

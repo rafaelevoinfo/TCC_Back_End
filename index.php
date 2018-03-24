@@ -16,9 +16,9 @@ $config['addContentLengthHeader'] = false;
 
 //****************** CONFIGURACOES DE RELEASE *************/
 $config['db']['host'] = 'localhost';
-$config['db']['user'] = 'id5062092_root';
+$config['db']['user'] = 'u645693451_root';
 $config['db']['pass'] = 'root04';
-$config['db']['dbname'] = 'id5062092_tcc';
+$config['db']['dbname'] = 'u645693451_tcc';
 
 $app = new \Slim\App(['settings' => $config]);
 
@@ -35,8 +35,8 @@ $container['db'] = function ($c) {
 
 //******************FAZENDO OS ROTEAMENTOS*************************
 //*********************** AUTENTICACAO ********************************** */
-$app->get('/auth', function (Request $request, Response $response, array $args) {
 //$app->get('/index/auth', function (Request $request, Response $response, array $args) {
+$app->get('/auth', function (Request $request, Response $response, array $args) {
     $vaController = new ControleAutenticacao($this);
     if (isset($_SERVER["PHP_AUTH_USER"]) && ($_SERVER["PHP_AUTH_PW"])) {
         return $vaController->autenticar($_SERVER["PHP_AUTH_USER"], $_SERVER["PHP_AUTH_PW"]);
@@ -52,8 +52,8 @@ $app->get('/usuarios', function (Request $request, Response $response, array $ar
     return $vaController->buscar('');
 });
 
-$app->get('/index/usuarios/{cpf_ou_nome}', function (Request $request, Response $response, array $args) {
-// $app->get('/usuarios/{cpf_ou_nome}', function (Request $request, Response $response, array $args) {
+//$app->get('/index/usuarios/{cpf_ou_nome}', function (Request $request, Response $response, array $args) {
+$app->get('/usuarios/{cpf_ou_nome}', function (Request $request, Response $response, array $args) {
     $vaController = new ControleUsuario($this);
     return $vaController->buscar($args['cpf_ou_nome']);
 });
@@ -71,3 +71,4 @@ $app->delete('/usuarios/{cpf}', function (Request $request, Response $response, 
 });
 
 $app->run();
+?>

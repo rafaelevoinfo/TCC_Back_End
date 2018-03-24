@@ -18,3 +18,5 @@ class ControleAutenticacao extends ControleBasico
         }
     }
 }
+
+?>

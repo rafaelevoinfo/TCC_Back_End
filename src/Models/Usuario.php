@@ -58,8 +58,16 @@ class Usuario extends UsuarioSimples
         return $senha === $this->senha;
     }
 
+    public function removerMascaraCpf($cpf){
+        $vaCpf = str_replace('.','',$cpf);
+        $vaCpf = str_replace('-','',$vaCpf);
+        return $vaCpf;
+    }
+
     public function carregarPorCpf($cpf)
     {
+        //vamos garantir que o CPf nao esta com mascara
+        $cpf = $this->removerMascaraCpf($cpf);
         $vaSql = self::SQL . ' where cliente.cpf = "' . $cpf . '"' . self::SQL_ORDER_BY . self::SQL_LIMIT;
         $this->buscarCarregar($vaSql, '\Models\Usuario');
         return ($this->cpf != '');
@@ -135,6 +143,7 @@ class Usuario extends UsuarioSimples
     private function gravarBanco($sql)
     {
         $vaStatement = $this->app->db->prepare($sql);
+        $this->cpf = $this->removerMascaraCpf($this->cpf);
         $vaStatement->bindValue(':cpf', $this->cpf);
         $vaStatement->bindValue(':nome', $this->nome);
         $vaStatement->bindValue(':endereco', $this->endereco);
@@ -170,3 +179,5 @@ class Usuario extends UsuarioSimples
 
     
 }
+
+?>

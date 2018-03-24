@@ -9,3 +9,5 @@ abstract class ControleBasicoCrud extends ControleBasico{
     protected abstract function criarObjeto($postData);
     
 }
+
+?>
