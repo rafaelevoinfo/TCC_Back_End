@@ -35,7 +35,6 @@ $container['db'] = function ($c) {
 
 //******************FAZENDO OS ROTEAMENTOS*************************
 //*********************** AUTENTICACAO ********************************** */
-//$app->get('/index/auth', function (Request $request, Response $response, array $args) {
 $app->get('/auth', function (Request $request, Response $response, array $args) {
     $vaController = new ControleAutenticacao($this);
     if (isset($_SERVER["PHP_AUTH_USER"]) && ($_SERVER["PHP_AUTH_PW"])) {
@@ -46,25 +45,21 @@ $app->get('/auth', function (Request $request, Response $response, array $args) 
 });
 
 //************************** Usuarios ********************************* */
-//$app->get('/index/usuarios', function (Request $request, Response $response, array $args) {
 $app->get('/usuarios', function (Request $request, Response $response, array $args) {
     $vaController = new ControleUsuario($this);
     return $vaController->buscar('');
 });
 
-//$app->get('/index/usuarios/{cpf_ou_nome}', function (Request $request, Response $response, array $args) {
 $app->get('/usuarios/{cpf_ou_nome}', function (Request $request, Response $response, array $args) {
     $vaController = new ControleUsuario($this);
     return $vaController->buscar($args['cpf_ou_nome']);
 });
 
-//$app->map(['PUT', 'POST'], '/index/usuarios', function (Request $request, Response $response, array $args) {
 $app->map(['PUT', 'POST'], '/usuarios', function (Request $request, Response $response, array $args) {
     $vaController = new ControleUsuario($this);
     return $vaController->salvar($request);
 });
 
-//$app->delete('/index/usuarios/{cpf}', function (Request $request, Response $response, array $args) {
 $app->delete('/usuarios/{cpf}', function (Request $request, Response $response, array $args) {
     $vaController = new ControleUsuario($this);
     return $vaController->excluir($args['cpf']);

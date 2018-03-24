@@ -32,7 +32,8 @@ class ControleUsuario extends ControleBasicoCrud
 
     public function excluir($cpf)
     {
-        $vaUsuario = new \Models\Usuario($this->app);                
+        $vaUsuario = new \Models\Usuario($this->app);  
+        //busca o usuario pelo CPF              
         if ($vaUsuario->carregarPorCpf($cpf)) {
             $vaStatus = $vaUsuario->excluir();
             return $this->retornarStatus($vaStatus);

@@ -73,9 +73,11 @@ class Usuario extends UsuarioSimples
         return ($this->cpf != '');
     }
 
+    //Busca os usuarios por nome
     public function buscarPorNome($nome)
     {
         $vaUsuarios = [];
+        //pega todos que comecarem com o conteudo da variavel $nome
         $vaSql = 'SELECT cliente.cpf,
                          cliente.nome
                   FROM cliente
@@ -89,6 +91,7 @@ class Usuario extends UsuarioSimples
         return $vaUsuarios;
     }
 
+    //Busca usuario por email
     public function carregarPorEmail($email)
     {
         $vaSql = self::SQL . ' where UPPER(cliente.email) = "' . strtoupper($email) . '"' . self::SQL_ORDER_BY . self::SQL_LIMIT;
@@ -96,6 +99,7 @@ class Usuario extends UsuarioSimples
         return ($this->cpf != '');
     }
 
+    //Busca todos os usuarios
     public function buscarTodos()
     {
         $vaUsuarios = [];
@@ -109,6 +113,7 @@ class Usuario extends UsuarioSimples
         return $vaUsuarios;
     }
 
+    //Exclui um usuario, exceto se for o administrador
     public function excluir()
     {
         if ($this->nome != 'admin') {
@@ -140,6 +145,7 @@ class Usuario extends UsuarioSimples
         return (!$usuario->carregarPorEmail($this->email)) || ($usuario->cpf === $this->cpf);
     }
 
+    //Grava os dados do usuario no banco
     private function gravarBanco($sql)
     {
         $vaStatement = $this->app->db->prepare($sql);
